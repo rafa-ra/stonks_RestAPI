@@ -64,9 +64,15 @@ export const postLogin = (req: Request, res: Response, next: NextFunction) => {
     password: string;
   };
 
+  interface UserAttributes {
+    id: number;
+    userName: string;
+    hash: string;
+  }
+
   (async () => {
     try {
-      const user = await User.findOne({
+      const user: any = await User.findOne({
         where: {
           username: username,
         },
@@ -77,19 +83,24 @@ export const postLogin = (req: Request, res: Response, next: NextFunction) => {
       } else {
         const userId = user.dataValues.id;
 
-        const token = jwt.sign(
-          { username: username, userId: userId },
-          "asd321",
-          { expiresIn: "1h" }
-        );
-        res
-          .status(200)
-          .json({
+        if (await bcrypt.compare(password, user.hash)) {
+          const token = jwt.sign(
+            { username: username, userId: userId },
+            "asd321",
+            { expiresIn: "1h" }
+          );
+
+          res.status(200).json({
             message: "User authenticated",
             user: userId.toString(),
             token: token,
           });
+        } else {
+          res.status(403).json({ message: "Senha incorreta" });
+        }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   })();
 };

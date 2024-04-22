@@ -1,28 +1,44 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../util/database";
+import User from "./user";
 
-const User = sequelize.define(
-  "User",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-      allowNull: false,
-    },
-    userName: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    hash: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    cash: {
-      type: DataTypes.DECIMAL(10, 2),
-      allowNull: false,
-      defaultValue: 10000.0,
-    },
+const Transaction = sequelize.define("Transaction", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   },
-  { timestamps: false }
-);
+  user_id: {
+    type: DataTypes.INTEGER,
+  },
+  stock_symbol: {
+    type: DataTypes.STRING(255),
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+  },
+  shares: {
+    type: DataTypes.INTEGER,
+  },
+  total: {
+    type: DataTypes.DECIMAL(10, 2),
+  },
+  type: {
+    type: DataTypes.ENUM("Purchase", "Sale"),
+    defaultValue: "Purchase",
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    allowNull: false,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    allowNull: false,
+    onUpdate: "CURRENT_TIMESTAMP",
+  },
+});
+
+Transaction.belongsTo(User, { foreignKey: "user_id" });
+export default Transaction;

@@ -1,13 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../util/database";
 
-type UserType = {
-  id: number;
-  userName: string;
-  hash: string;
-  cash: number;
-};
-
 const User = sequelize.define(
   "User",
   {
